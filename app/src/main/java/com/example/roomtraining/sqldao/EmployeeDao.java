@@ -3,6 +3,7 @@ package com.example.roomtraining.sqldao;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -42,12 +43,117 @@ public interface EmployeeDao {
      * Главное - аннотации.
      * @param employee
      */
+//    @Insert
+//    void insert(Employee employee);
+
+    /**
+     * Вставка нескольких объектов
+     * Мы можем передавать в метод не один, а несколько объектов, используя varargs
+     * @param employees
+     */
     @Insert
+    void insert(Employee... employees);
+
+    /**
+     * Также, это может быть список
+     * @param employees
+     */
+    @Insert
+    void insert(List<Employee> employees);
+
+    /**
+     * Или это вообще может быть любой Iterable
+     * При вызове этого метода вы можете использовать массив или коллекцию.
+     * @param employees
+     */
+    @Insert
+    void insert(Iterable<Employee> employees);
+
+    /**
+     * Получение id
+     * При вставке метод Insert может возвращать id только что добавленной записи.
+     * Для этого надо описать метод так, чтобы он возвращал long.
+     * @param employee
+     * @return Если в Employee есть числовой первичный ключ, то именно его значение вы и получите.
+     */
+//    @Insert
+//    long insert(Employee employee);
+
+    /**
+     * В случае добавления нескольких записей, необходимо использовать long[]
+     * @param employees
+     * @return
+     */
+//    @Insert
+//    long[] insert(List<Employee> employees);
+
+    /**
+     * или List<Long>
+     */
+//    @Insert
+//    List <Long> insert(List<Employee> employees);
+
+    /**
+     * Режимы вставки
+     * Рассмотрим ситуацию, когда мы вставляем в таблицу запись, но обнаруживается,
+     * что запись с таким ключом там уже есть. По умолчанию мы получим ошибку:
+     * SQLiteConstraintException: UNIQUE constraint failed. И ничего в базу не запишется.
+     *
+     * Но это можно поменять с помощью параметра onConflict.
+     *
+     * В режиме REPLACE старая запись будет заменена новой. Этот режим хорошо подходит, если вам
+     * надо вставить запись, если ее еще нет в таблице или обновить запись, если она уже есть.
+     *
+     * Также есть режим IGNORE. В этом режиме будет оставлена старая запись и операция вставки
+     * не будет выполнена.
+     * @param employee
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Employee employee);
 
+    /**
+     * Update
+     * Эта аннотация аналогична Insert, но она не вставляет, а обновляет объекты в бд.
+     *
+     * Так же, как и с Insert мы можем использовать коллекции и varargs, чтобы обновлять
+     * несколько объектов сразу.
+     *
+     * Update ищет в бд запись по ключу. Если не найдет, то ничего не произойдет.
+     * Если найдет, то обновит все поля, а не только те, которые мы заполнили в Entity объекте.
+     *
+     * Как и Insert, Update поддерживает параметр onConflict.
+     * @param employee
+     */
     @Update
     void update(Employee employee);
 
+    /**
+     * Мы можем получить количество обновленных записей. Для этого опишите метод так,
+     * чтобы он возвращал int.
+     * @param employee
+     */
+    @Update
+    int update(List<Employee> employee);
+
+    /**
+     * Delete
+     * Методы с аннотацией Delete будут удалять объекты.
+     *
+     * В Delete методах мы также можем использовать коллекции и varargs,
+     * чтобы удалять несколько объектов сразу.
+     *
+     * Delete ищет в бд запись по ключу.
+     * @param employee
+     */
     @Delete
     void delete(Employee employee);
+
+    /**
+     * Мы можем получить количество удаленных записей.
+     * Для этого необходимо описать метод так, чтобы он возвращал int.
+     * @param employee
+     * @return
+     */
+    @Delete
+    int delete(List<Employee> employee);
 }
