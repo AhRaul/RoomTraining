@@ -29,34 +29,34 @@ import static androidx.room.ForeignKey.CASCADE;
  *
  * Аннотацией PrimaryKey мы помечаем поле, которое будет ключом в таблице.
  */
-//@Entity(tableName = "employees")      //По умолчанию в качестве имени таблицы используется
-                                        // имя этого класса. Но мы можем указать свое имя,
-                                        // используя параметр tableName.
-@Entity
-public class Employee {
-
-    // Первичный ключ
-
-    // Каждый Entity класс должен содержать хотя бы одно @PrimaryKey поле.
-    // Даже если в классе всего одно поле.
-    // У PrimaryKey есть параметр autoGenerate. Он позволяет включить для поля режим autoincrement,
-    // в котором база данных сама будет генерировать значение, если вы его не укажете.
-    // Теперь при создании Entity объекта вы можете не заполнять поле id.
-    // База сама найдет ближайшее свободное значение и использует его.
- @PrimaryKey(autoGenerate = true)
-//    @PrimaryKey
-    public long id;
-
-    // По умолчанию в качестве имени полей в таблице используются имена полей Entity класса.
-    // Но мы можем указать свое имя, используя параметр name в аннотации ColumnInfo.
-//    @ColumnInfo(name = "full_name")
-    public String name;
-
-    // По умолчанию Room определяет тип данных для поля в таблице по типу данных поля в
-    // Entity классе. Но мы можем явно указать свой тип.
-//    @ColumnInfo(typeAffinity = TEXT)
-    public int salary;
-}
+////@Entity(tableName = "employees")      //По умолчанию в качестве имени таблицы используется
+//                                        // имя этого класса. Но мы можем указать свое имя,
+//                                        // используя параметр tableName.
+//@Entity
+//public class Employee {
+//
+//    // Первичный ключ
+//
+//    // Каждый Entity класс должен содержать хотя бы одно @PrimaryKey поле.
+//    // Даже если в классе всего одно поле.
+//    // У PrimaryKey есть параметр autoGenerate. Он позволяет включить для поля режим autoincrement,
+//    // в котором база данных сама будет генерировать значение, если вы его не укажете.
+//    // Теперь при создании Entity объекта вы можете не заполнять поле id.
+//    // База сама найдет ближайшее свободное значение и использует его.
+// @PrimaryKey(autoGenerate = true)
+////    @PrimaryKey
+//    public long id;
+//
+//    // По умолчанию в качестве имени полей в таблице используются имена полей Entity класса.
+//    // Но мы можем указать свое имя, используя параметр name в аннотации ColumnInfo.
+////    @ColumnInfo(name = "full_name")
+//    public String name;
+//
+//    // По умолчанию Room определяет тип данных для поля в таблице по типу данных поля в
+//    // Entity классе. Но мы можем явно указать свой тип.
+////    @ColumnInfo(typeAffinity = TEXT)
+//    public int salary;
+//}
 
 //__________________________________________________________________________________________________
 /**
@@ -292,3 +292,21 @@ public class Employee {
 //    @Ignore
 //    public Bitmap avatar;
 //}
+
+/**
+ * Создан, как пример для тренировки Query запросов (урок 8)
+ */
+@Entity
+public class Employee {
+
+    @PrimaryKey()
+    public long id;
+
+    @ColumnInfo(name = "first_name")
+    public String firstName;
+
+    @ColumnInfo(name = "last_name")
+    public String lastName;
+
+    public int salary;
+}

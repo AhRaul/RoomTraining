@@ -1,8 +1,12 @@
 package com.example.roomtraining;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.roomtraining.app.App;
 import com.example.roomtraining.sqldao.CarDao;
@@ -10,9 +14,11 @@ import com.example.roomtraining.sqldatabase.AppDatabase;
 import com.example.roomtraining.sqldao.EmployeeDao;
 import com.example.roomtraining.sqlentityes.Employee;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+public static final String TAG = "MainActivity";
 
     AppDatabase db;
     EmployeeDao employeeDao;
@@ -28,6 +34,24 @@ public class MainActivity extends AppCompatActivity {
         //получение доступа к Dao командам через db
         employeeDao = db.employeeDao();
         carDao = db.carDao();
+
+        //Получение данных в коде Activity выглядит так:
+        //Получаем LiveData и подписываемся на него.
+        //
+        // Использование LiveData имеет огромное преимущество перед использование списка или массива.
+        // Подписавшись на LiveData, вы будете получать свежие данные при их изменении в базе.
+        // Т.е. при добавлении новых, удалении старых или обновлении текущих данных в таблице
+        // employee, Room снова выполнит ваш Query запрос, и вы получите в onChanged методе
+        // актуальные данные с учетом последних изменений. Вам больше не надо самим запрашивать
+        // эти данные каждый раз. И все это будет приходить вам в UI поток.
+        LiveData<List<Employee>> employeesLiveData = employeeDao.getAll();
+
+        employeesLiveData.observe(this, new Observer<List<Employee>>() {
+           @Override
+           public void onChanged(@Nullable List<Employee> employees) {
+               Log.d(TAG, "onChanged: " + employees);
+           }
+        });
     }
 
     /**
@@ -39,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public void createNewEmployee() {
         Employee employee = new Employee();
         employee.id = 1;
-        employee.name = "John Smith";
+        employee.firstName = "John Smith";
         employee.salary = 10000;
 
         employeeDao.insert(employee);
@@ -50,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
      *     (должны выполняться не в UI потоке.)
      * @return
      */
-    public List<Employee> getEmployeeList() {
-        return employeeDao.getAll();
-    }
+//    public List<Employee> getEmployeeList() {
+//        return employeeDao.getAll();
+//    }
 
     /**
      * Получение сотрудника по id:
@@ -86,5 +110,23 @@ public class MainActivity extends AppCompatActivity {
      */
     public void deleteEmployee(Employee employee) {
         employeeDao.delete(employee);
+    }
+
+    /**
+     * Опциональный Update query метод, пример вызова
+     * @return количество обновленных строк
+     */
+    public int updateSalaryByIdList() {
+        int updatedCount = db.employeeDao().updateSalaryByIdList(Arrays.asList(1L, 3L, 4L), 10000);
+        return updatedCount;
+    }
+
+    /**
+     * Опциональный delete query метод, пример вызова
+     * @return количество удаленных строк
+     */
+    public int deleteByIdList() {
+        int deletedCount = db.employeeDao().deleteByIdList(Arrays.asList(1L, 3L, 4L));
+        return deletedCount;
     }
 }

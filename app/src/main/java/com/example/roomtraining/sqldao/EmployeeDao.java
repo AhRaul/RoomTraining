@@ -1,5 +1,8 @@
 package com.example.roomtraining.sqldao;
 
+import android.database.Cursor;
+
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -8,6 +11,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.example.roomtraining.sqlentityes.Employee;
+import com.example.roomtraining.sqlentityes.Name;
 
 import java.util.List;
 
@@ -31,11 +35,109 @@ public interface EmployeeDao {
      *
      * @return
      */
+//    @Query("SELECT * FROM employee")
+//    List<Employee> getAll();
+
+    /**
+     * Room умеет возвращать данные в LiveData обертке.
+     * @return
+     */
     @Query("SELECT * FROM employee")
-    List<Employee> getAll();
+    LiveData<List<Employee>> getAll();
+
+    /**
+     * Вместо List, мы также можем использовать массив:
+     * @return
+     */
+//    @Query("SELECT * FROM employee")
+//    Employee[] getAll();
+
+    /**
+     * И даже Cursor, если это необходимо по каким-то причинам:
+     * @return
+     */
+//    @Query("SELECT * FROM employee")
+//    Cursor getAll();
 
     @Query("SELECT * FROM employee WHERE id = :id")
     Employee getByID(long id);
+
+    /**
+     * Поиск сотрудников с зарплатой больше заданного значения
+     * @return
+     */
+    @Query("SELECT * FROM employee WHERE salary > :minSalary")
+    List<Employee> getAllWithSalaryMoreThan(int minSalary);
+
+    /**
+     * Поиск сотрудников с зарплатой в заданном диапазоне
+     * @return
+     */
+    @Query("SELECT * FROM employee WHERE salary BETWEEN :minSalary AND :maxSalary")
+    List<Employee> getAllWithSalaryBetween(int minSalary, int maxSalary);
+
+    /**
+     *Поиск сотрудников по имени или фамилии
+     * @return
+     */
+    @Query("SELECT * FROM employee WHERE first_Name Like :search OR last_name Like :search")
+    List<Employee> getAllWithNameLike(String search);
+
+    /**
+     * Поиск сотрудников по списку id.
+     * @return
+     */
+    @Query("SELECT * FROM employee WHERE id IN (:idList)")
+    List<Employee> getByIdList(List<Long> idList);
+
+    /**
+     * Subsets
+     * Часто при запросе данных нам нужно получить из таблицы не все поля, а только некоторые.
+     * Такие запросы быстрее и легче, чем тянуть все поля.
+     *
+     * Допустим нам надо получать только имя и фамилию сотрудника. Если сделать так:
+     *
+     * @Query("SELECT first_name, last_name FROM employee")
+     * List<Employee> getNames();
+     *
+     * то уже при компиляции получим ошибку: The columns returned by the query does not have
+     * the fields [id,salary] in Employee even though they are annotated as non-null or primitive.
+     * Columns returned by the query: [first_name,last_name].
+     *
+     * Room сообщает, что в данных, которые вернет этот запрос, не хватает полей, чтобы заполнить
+     * все поля объекта Employee.
+     *
+     * В этом случае мы можем использовать отдельный объект. (см. класс Name)
+     */
+    @Query("SELECT first_name, last_name FROM employee")
+    List<Name> getNames();
+
+    /**
+     * insert, update и delete запросы
+     * Аннотации Insert, Update и Delete позволяют нам модифицировать данные, но их возможности
+     * слишком ограниченны. Часто возникает необходимость обновить только некоторые поля или
+     * удалить записи по определенному условию. Это можно сделать запросами с помощью Query.
+     *
+     * Давайте рассмотрим пару примеров.
+     *
+     * Обновление зарплат у сотрудников по списку id.
+     *
+     * Опционально метод может возвращать int значение, в котором мы получим количество обновленных
+     * строк. Если вам это не нужно, то делайте метод void.
+     * (Вызов метода: см метод updateSalaryByIdList() в Main классе)
+     */
+    @Query("UPDATE employee SET salary =:newSalary WHERE id IN (:idList)")
+    int updateSalaryByIdList(List<Long> idList, int newSalary);
+
+    /**
+     * Удаление сотрудников по списку id
+     *
+     * Запросы удаления также могут возвращать int значение, в котором мы получим количество
+     * удаленных строк.
+     * (Вызов метода: см метод deleteByIdList() в Main классе)
+     */
+    @Query("DELETE from employee WHERE id IN (:idList)")
+    int deleteByIdList(List<Long> idList);
 
     /**
      * Для вставки/обновления/удаления используются методы insert/update/delete с соответствующими
