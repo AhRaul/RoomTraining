@@ -4,8 +4,10 @@ import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
 import com.example.roomtraining.sqldao.CarDao;
+import com.example.roomtraining.sqldao.DepartmentDao;
 import com.example.roomtraining.sqldao.EmployeeDao;
 import com.example.roomtraining.sqlentityes.Car;
+import com.example.roomtraining.sqlentityes.Department;
 import com.example.roomtraining.sqlentityes.Employee;
 
 /**
@@ -18,8 +20,9 @@ import com.example.roomtraining.sqlentityes.Employee;
  * В Database классе необходимо описать абстрактные методы для получения Dao объектов,
  * которые вам понадобятся.
  */
-@Database(entities = {Employee.class, Car.class}, version = 1)
+@Database(entities = {Employee.class, Car.class, Department.class}, version = 1)
 public abstract  class AppDatabase extends RoomDatabase {
     public abstract EmployeeDao employeeDao();
     public abstract CarDao carDao();
+    public abstract DepartmentDao departmentDao();
 }

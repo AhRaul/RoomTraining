@@ -293,8 +293,32 @@ import static androidx.room.ForeignKey.CASCADE;
 //    public Bitmap avatar;
 //}
 
+//__________________________________________________________________________________________________
 /**
  * Создан, как пример для тренировки Query запросов (урок 8)
+ */
+//@Entity
+//public class Employee {
+//
+//    @PrimaryKey()
+//    public long id;
+//
+//    @ColumnInfo(name = "first_name")
+//    public String firstName;
+//
+//    @ColumnInfo(name = "last_name")
+//    public String lastName;
+//
+//    public int salary;
+//}
+
+//__________________________________________________________________________________________________
+/**
+ * Создан для тренировки Relation (урок 10)
+ * Для примера будем использовать две таблицы: сотрудники и отделы. Каждый сотрудник прикреплен к
+ * какому-либо отделу.
+ *
+ * Entity объект для отделов:
  */
 @Entity
 public class Employee {
@@ -302,11 +326,13 @@ public class Employee {
     @PrimaryKey()
     public long id;
 
-    @ColumnInfo(name = "first_name")
-    public String firstName;
-
-    @ColumnInfo(name = "last_name")
-    public String lastName;
+    public String name;
 
     public int salary;
+
+    /**
+     * В поле departmentId хранится id отдела, к которому прикреплен сотрудник.
+     */
+    @ColumnInfo(name = "department_id")
+    public int departmentId;
 }

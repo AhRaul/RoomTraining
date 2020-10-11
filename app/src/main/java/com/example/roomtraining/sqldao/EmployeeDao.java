@@ -8,9 +8,12 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
+import com.example.roomtraining.sqlentityes.DepartmentWithEmployees;
 import com.example.roomtraining.sqlentityes.Employee;
+import com.example.roomtraining.sqlentityes.EmployeeDepartment;
 import com.example.roomtraining.sqlentityes.Name;
 
 import java.util.List;
@@ -135,8 +138,8 @@ public interface EmployeeDao {
      *Поиск сотрудников по имени или фамилии
      * @return
      */
-    @Query("SELECT * FROM employee WHERE first_Name Like :search OR last_name Like :search")
-    List<Employee> getAllWithNameLike(String search);
+//    @Query("SELECT * FROM employee WHERE first_Name Like :search OR last_name Like :search")
+//    List<Employee> getAllWithNameLike(String search);
 
     /**
      * Поиск сотрудников по списку id.
@@ -173,8 +176,8 @@ public interface EmployeeDao {
      *
      * В этом случае мы можем использовать отдельный объект. (см. класс Name)
      */
-    @Query("SELECT first_name, last_name FROM employee")
-    List<Name> getNames();
+//    @Query("SELECT first_name, last_name FROM employee")
+//    List<Name> getNames();
 
     /**
      * insert, update и delete запросы
@@ -202,6 +205,29 @@ public interface EmployeeDao {
      */
     @Query("DELETE from employee WHERE id IN (:idList)")
     int deleteByIdList(List<Long> idList);
+
+    /**
+     * Мы хотим получить список работников, в котором будет следующая информация: имя работника,
+     * его зарплата, наименование его отдела. Для этого нам надо будет написать запрос, который
+     * вытащит данные из двух таблиц.
+     *
+     * Т.к. поле name есть в обоих таблицах, то для отдела переименовываем его в department_name
+     * @return
+     */
+//    @Query("SELECT employee.name, employee.salary, department.name AS department_name " +
+//            "FROM employee, department " +
+//            "WHERE department.id == employee.department_id")
+//    public List<EmployeeDepartment> getEmployeeWithDepartment();
+
+    /**
+     * Relation+Transaction
+     * При использовании Relation, Room выполняет несколько запросов, чтобы собрать все данные.
+     * Имеет смысл выполнять все эти запросы в одной транзакции, чтобы получить корректные данные.
+     * Для этого можно использовать аннотацию Transaction
+     */
+    @Transaction
+    @Query("SELECT id, name from department")
+    List<DepartmentWithEmployees> getDepartmentWithEmployees();
 
     /**
      * Для вставки/обновления/удаления используются методы insert/update/delete с соответствующими

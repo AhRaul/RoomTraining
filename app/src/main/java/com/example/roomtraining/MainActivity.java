@@ -12,6 +12,7 @@ import com.example.roomtraining.app.App;
 import com.example.roomtraining.sqldao.CarDao;
 import com.example.roomtraining.sqldatabase.AppDatabase;
 import com.example.roomtraining.sqldao.EmployeeDao;
+import com.example.roomtraining.sqlentityes.Department;
 import com.example.roomtraining.sqlentityes.Employee;
 
 import java.util.Arrays;
@@ -23,6 +24,7 @@ public static final String TAG = "MainActivity";
     AppDatabase db;
     EmployeeDao employeeDao;
     CarDao carDao;
+    Department department;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public static final String TAG = "MainActivity";
         //получение доступа к Dao командам через db
         employeeDao = db.employeeDao();
         carDao = db.carDao();
+//        department = db.departmentDao();
 
         //Получение данных в коде Activity выглядит так:
         //Получаем LiveData и подписываемся на него.
@@ -60,14 +63,14 @@ public static final String TAG = "MainActivity";
      *
      * Добавление нового сотрудника в базу будет выглядеть так:
      */
-    public void createNewEmployee() {
-        Employee employee = new Employee();
-        employee.id = 1;
-        employee.firstName = "John Smith";
-        employee.salary = 10000;
-
-        employeeDao.insert(employee);
-    }
+//    public void createNewEmployee() {
+//        Employee employee = new Employee();
+//        employee.id = 1;
+//        employee.firstName = "John Smith";
+//        employee.salary = 10000;
+//
+//        employeeDao.insert(employee);
+//    }
 
     /**
      * Метод getAll вернет нам всех сотрудников в List<Employee>
