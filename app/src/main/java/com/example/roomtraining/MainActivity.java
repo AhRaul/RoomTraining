@@ -44,7 +44,7 @@ public static final String TAG = "MainActivity";
         // employee, Room снова выполнит ваш Query запрос, и вы получите в onChanged методе
         // актуальные данные с учетом последних изменений. Вам больше не надо самим запрашивать
         // эти данные каждый раз. И все это будет приходить вам в UI поток.
-        LiveData<List<Employee>> employeesLiveData = employeeDao.getAll();
+        LiveData<List<Employee>> employeesLiveData = employeeDao.getAllLifeData();
 
         employeesLiveData.observe(this, new Observer<List<Employee>>() {
            @Override
@@ -86,7 +86,7 @@ public static final String TAG = "MainActivity";
      * @return
      */
     public Employee getEmployeeByID(long id) {
-        return employeeDao.getByID(id);
+        return employeeDao.getByIDnoRX(id);
     }
 
     /**

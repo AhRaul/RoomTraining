@@ -15,6 +15,10 @@ import com.example.roomtraining.sqlentityes.Name;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+
 /**
  * В объекте Dao мы будем описывать методы для работы с базой данных. Нам нужны будут методы
  * для получения списка сотрудников и для добавления/изменения/удаления сотрудников.
@@ -43,7 +47,25 @@ public interface EmployeeDao {
      * @return
      */
     @Query("SELECT * FROM employee")
-    LiveData<List<Employee>> getAll();
+    LiveData<List<Employee>> getAllLifeData();
+
+    /**
+     * RxJava
+     *В Dao указываем для метода выходной тип Flowable
+     * @return
+     */
+    @Query("SELECT * FROM employee")
+    Flowable<List<Employee>> getAll();
+
+    /**
+     * RxJava
+     * Если при запросе нескольких записей,
+     * вместо Flowable<List<Employee>> использовать Flowable<Employee>:
+     * то мы получим только первую запись из всего результата.
+     * @return
+     */
+//    @Query("SELECT * FROM employee")
+//    Flowable<Employee> getAll();
 
     /**
      * Вместо List, мы также можем использовать массив:
@@ -60,7 +82,40 @@ public interface EmployeeDao {
 //    Cursor getAll();
 
     @Query("SELECT * FROM employee WHERE id = :id")
-    Employee getByID(long id);
+    Employee getByIDnoRX(long id);
+
+    /**
+     * RxJava
+     * Если же мы составляем запрос для получения только одной записи,
+     * то Flowable<Employee> вполне подойдет.
+     *
+     * Метод в Dao
+     * @return
+     */
+    @Query("SELECT * FROM employee WHERE id = :id")
+    Flowable<Employee> getByID(long id);
+
+    /**
+     * У вышеописанного примера есть минус. Если записи нет в базе, то Flowable вообще ничего нам
+     * не пришлет. Т.е. это будет выглядеть так, как будто он все еще выполняет запрос.
+     * Это можно исправить следующим образом:
+     * Хоть мы и ожидаем всего одну запись, но используем не Flowable<Employee>,
+     * а Flowable<List<Employee>>. И если записи нет, то мы хотя бы получим пустой лист вместо
+     * полной тишины.
+     * @param id
+     * @return
+     */
+//    @Query("SELECT * FROM employee WHERE id = :id")
+//    Flowable<List<Employee>> getByID(long id);
+
+    /**
+     * Single
+     * Рассмотрим тот же пример с запросом одной записи, но с использованием Single. Напомню,
+     * что в Single может прийти только один onNext, либо OnError. После этого Single считается
+     * завершенным.
+     */
+    @Query("SELECT * FROM employee WHERE id = :id")
+    Single<Employee> getByIdSingle(long id);
 
     /**
      * Поиск сотрудников с зарплатой больше заданного значения
@@ -89,6 +144,15 @@ public interface EmployeeDao {
      */
     @Query("SELECT * FROM employee WHERE id IN (:idList)")
     List<Employee> getByIdList(List<Long> idList);
+
+    /**
+     * Maybe
+     * Рассмотрим тот же пример с запросом одной записи, но с использованием Maybe. Напомню,
+     * что в Maybe может прийти либо один onNext, либо onComplete, либо OnError. После этого Maybe
+     * считается завершенным.
+     */
+    @Query("SELECT * FROM employee WHERE id IN (:id)")
+    Maybe<Employee> getByIdMaybe(long id);
 
     /**
      * Subsets
