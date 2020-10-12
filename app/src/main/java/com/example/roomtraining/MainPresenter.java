@@ -1,12 +1,15 @@
 package com.example.roomtraining;
 
 import com.example.roomtraining.app.App;
+import com.example.roomtraining.sqldao.EmployeeDao;
 import com.example.roomtraining.sqldatabase.AppDatabase;
 import com.example.roomtraining.sqlentityes.Employee;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -23,7 +26,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class MainPresenter {
 
-    AppDatabase db = App.getInstance().getDatabase();
+    private AppDatabase db = App.getInstance().getDatabase();
+    private final EmployeeDao employeeDao = db.employeeDao();
+    private Disposable disposable = null;
 
     /**
      * В коде подписываемся и получаем данные
@@ -149,5 +154,38 @@ public class MainPresenter {
 
                     }
                 });
+    }
+
+    public void insertEmployee(Employee employee) {
+        disposable = Completable.fromAction(() -> employeeDao.insert(employee))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        () -> {
+                            System.out.println("NOTE SAVED");
+                        }, Throwable::printStackTrace
+                );
+    }
+
+    public void updateEmployee(Employee employee) {
+        disposable = Completable.fromAction(() -> employeeDao.insert(employee))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        () -> {
+                            System.out.println("NOTE UPDATED");
+                        }, Throwable::printStackTrace
+                );
+    }
+
+    public void deleteEmployee(Employee employee) {
+        disposable = Completable.fromAction(() -> employeeDao.delete(employee))
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        () -> {
+                            System.out.println("NOTE DELETED");
+                        },
+                        Throwable::printStackTrace
+                );
     }
 }
